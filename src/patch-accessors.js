@@ -176,6 +176,8 @@ let OutsideAccessors = {
 
 };
 
+const nativeAppendChild = Object.getOwnPropertyDescriptor(Node.prototype, 'appendChild');
+
 let InsideAccessors = {
 
   childNodes: {
@@ -346,7 +348,7 @@ let InsideAccessors = {
         htmlContainer.innerHTML = text;
       }
       while (htmlContainer.firstChild) {
-        content.appendChild(htmlContainer.firstChild);
+        nativeAppendChild.value.call(content, htmlContainer.firstChild);
       }
     },
     configurable: true
