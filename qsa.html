@@ -1,0 +1,63 @@
+<!doctype html>
+<!--
+@license
+Copyright (c) 2014 The Polymer Project Authors. All rights reserved.
+This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
+The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+Code distributed by Google as part of the polymer project is also
+subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+-->
+<html>
+<head>
+  <meta charset="utf-8">
+  <script>
+    ShadyDOM = {force: true};
+  </script>
+  <script src="../shadydom.min.js"></script>
+</head>
+<body>
+  <div id="has-shady-root">
+    <div id="slotted">Put in to direct shadow2</div>
+    <div id="slotted2">Put in to direct shadow1</div>
+  </div>
+  <div id="not-shady"></div>
+  <script>
+    const testPerf = false
+    const selectors = []
+    if (testPerf) {
+      let html = ''
+      for(var i = 0; i < 1000; i++) {
+        html += `<div class="j${i}"></div>`
+        html += `<b></b>`
+        selectors.push(`.j${i}`)
+      }
+      document.querySelector('#not-shady').innerHTML = html
+    }
+
+
+    const div = document.querySelector('#has-shady-root')
+    div.attachShadow({mode: 'open'})
+    div.shadowRoot.innerHTML = '<span id="light-dom">div</span>: [<slot></slot>]'
+    const child = div.shadowRoot.querySelector('#light-dom')
+    child.attachShadow({mode: 'open'})
+    child.shadowRoot.innerHTML = '<span id="shady-child">child</span>: [<slot></slot>]'
+    const childOfChild = child.shadowRoot.querySelector('#shady-child')
+    childOfChild.attachShadow({mode: 'open'})
+    childOfChild.shadowRoot.innerHTML = '<span>childOfChild</span>: [<slot></slot>]'
+    console.log('elements in div - slotted & slotted2', div.querySelectorAll('div, span, slot'));
+    console.log('elements in shady root - slot & #light-dom', div.shadowRoot.querySelectorAll('div, span, slot'));
+    console.log('elements in shady root\'s child - shady-child & slot', child.shadowRoot.querySelectorAll('div, span, slot'));
+    console.log('elements in child\'s child - shady-child & slot', childOfChild.shadowRoot.querySelectorAll('div, span, slot'));
+    console.log('all elements - has-shady-root & slotted & slotted2 & not-shady', document.querySelectorAll('div, span, slot'));
+
+    if (testPerf) {
+      for (var i = 0; i < 10; i++) {
+        console.time(i);
+        var a = document.querySelectorAll(selectors);
+        console.timeEnd(i);
+      }
+    }
+  </script>
+</body>
+</html>
